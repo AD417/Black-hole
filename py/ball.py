@@ -1,6 +1,7 @@
 from __future__ import annotations
 from random import random, randint, choice
 from math import sqrt
+from typing import Any
 
 class Ball():
     """
@@ -8,6 +9,8 @@ class Ball():
     """
 
     def __init__(self: Ball) -> Ball:
+        # The color of the ball, for rendering.
+        self.color = (0, 127, 255)
         # The radius of the ball, in pixels
         self._r: int = 1
         # The mass of the ball, required for momentum calculations
@@ -38,5 +41,16 @@ class Ball():
                 self.vel[key] *= -1
 
     def radius(self: Ball) -> int:
-        """Get the radius of the ball"""
+        """Get the current radius of the ball"""
         return self._r
+
+    def render(self: Ball) -> dict[str, Any]:
+        """
+        Produce data required for the rendering of the ball.
+        :return: a kwarg dictionary containing values important for Pygame rendering.
+        """
+        return {
+            "color": self.color,
+            "center": (self.pos["x"], self.pos["y"]),
+            "radius": self.radius()
+        }

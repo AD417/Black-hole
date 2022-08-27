@@ -17,16 +17,14 @@ while True:
 
     # Fill the background with white
     screen.fill((0, 0, 0))
+
+    # For every ball...
     for ball in b:
-        ball.move(50)
-        # Draw a solid blue circle in the center
-        pygame.draw.circle(
-            screen,                             # Location
-            (0, 0, 255),                        # Color RGB
-            (ball.pos["x"], ball.pos["y"]),     # Position XY
-            ball.radius() * 3                   # Radius Pixels.
-        )
+        # Move it
+        ball.move(16) # TODO: prevent lost time with time module.
+        # And draw it to the screen.
+        pygame.draw.circle(screen, **ball.render())
 
     # Render
     pygame.display.flip()
-    print((time_ns() - now) / 1000000)
+    # print((time_ns() - now) / 1000000)
