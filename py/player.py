@@ -19,7 +19,7 @@ class Playerball(Ball):
         # The speed of growth, in change in radius per second. 
         self.grow_speed: int = 100
         # The vertical acceleration of the ball in px/s^2. 
-        self.gravity: float = 735 # Random guesses. 75 * g
+        self.gravity: float = 735 # Random guesses. 75 * g feels good.
         # The positon of the ball. Follows the position of the mouse, which is passed to this as an xy parameter.
         self.pos: dict[str, float] = {"x": x, "y": y}
         self.vel: dict[str, float] = {"x": 0, "y": 0}
@@ -34,14 +34,14 @@ class Playerball(Ball):
             "y": position_tuple[1],
         }
 
-    def increase_radius(self: Playerball, dt: int) -> None:
+    def increase_radius(self: Playerball, dt: float) -> None:
         self._r += self.grow_speed * dt / 1000
         # If the ball's growth has hit a wall...
         if abs(self.pos["x"] - 500) + self.radius() > 500 or abs(self.pos["y"] - 500) + self.radius() > 500:
             # Then immediately stop growing. 
             self.is_growing = False
 
-    def move(self: Playerball, dt: int) -> None:
+    def move(self: Playerball, dt: float) -> None:
         if self.pos["y"] != 1000 - self.radius():
             self.vel["y"] += self.gravity * dt / 1000
             self.pos["y"] = min(self.pos["y"] + self.vel["y"] * dt / 1000, 1000 - self.radius())
@@ -51,7 +51,7 @@ class Playerball(Ball):
     def onmouseup(self: Playerball) -> None:
         self.is_growing = False
 
-    def tick(self: Playerball, dt: int) -> None:
+    def tick(self: Playerball, dt: float) -> None:
         if self.is_growing:
             self.follow_mouse()
             self.increase_radius(dt)

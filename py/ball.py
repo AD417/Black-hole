@@ -13,8 +13,8 @@ class Ball():
         self.color: tuple[int] = (0, 127, 255)
         # The radius of the ball, in pixels
         self._r: float = 25.0
-        # The mass of the ball, required for momentum calculations
-        self._m = 1.0
+        # The density of the ball, required for momentum calculations
+        self._d = 1.0
         # The position of the ball. 
         self.pos: dict[str, float] = {"x": randint(100, 900), "y": randint(100, 900)}
         # The velocity and velocity vector of the ball.
@@ -35,14 +35,18 @@ class Ball():
     def collides_with(self: Ball, other: Ball) -> bool:
         return self.distance_to(other) < self.radius() + other.radius()
 
+    def mass(self: Ball) -> float:
+        """Calculate the mass of the ball, given the area and density of the ball"""
+        return self.radius() ** 2 * self._d
+
     def momentum(self: Ball) -> float:
         """Calculate the momentum of the ball, using p = mv"""
-        return self._m * self.velocity
+        return self.mass() * self.velocity
 
-    def move(self: Ball, dt: int) -> None:
+    def move(self: Ball, dt: float) -> None:
         """
         Move the ball, based on the amount of time since the last tick
-        :param dt: the amount of time, in milliseconds, that has passed since the last move.
+        :param dt: the amount of time, in milliseconds, that has passed since the last move
         """
         for key in self.vel:
             self.pos[key] += self.vel[key] * (dt / 1000)
@@ -65,7 +69,7 @@ class Ball():
             "radius": self.radius()
         }
 
-    def tick(self: Ball, dt: int) -> None:
+    def tick(self: Ball, dt: float) -> None:
         """
         Perform updates for this entity for this frame/tick.
         """

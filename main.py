@@ -35,6 +35,7 @@ class App():
 
         self.tickdata = []
 
+    # This is the main game loop; keep it at the top of the class.
     def gameloop(self: App) -> None:
         # Event handler and mouse state checking. 
         for event in pygame.event.get():
@@ -51,7 +52,7 @@ class App():
                 self.ball_is_growing = False
                 self.player_balls[-1].onmouseup()
 
-        # This frame -- the time difference between this frame and the last frame
+        # This tick -- the time difference between this tick and the last tick
         # Will be used for timing purposes. 
         this_tick: int = time_ns()
 
@@ -60,6 +61,36 @@ class App():
         # Dt: the amount of time between frames.
         # 1 000 000 ns = 1ms. Calculations will be done in ms.
         dt: float = (this_tick - self._last_tick) / 1e6
+
+        self.tick(dt)
+
+        self._last_tick = this_tick
+
+        ### FRAME PROCESSING: 
+
+        # Do not continue if not enough time has passed between frames. 
+        if this_tick - self._last_frame < 1e9 // FPS:
+            return
+
+        self.frame()
+
+        self._last_frame = this_tick
+
+    def frame(self: App) -> None:
+        # Reset the screen. 
+        self.screen.fill((0, 0, 0))
+        # Game balls.
+        for ball in self.game_balls:
+            pygame.draw.circle(self.screen, **ball.render())
+        # Player balls.
+        for ball in self.player_balls:
+            pygame.draw.circle(self.screen, **ball.render())
+
+        # Render
+        pygame.display.flip()
+
+    def tick(self: App, dt: float) -> None:
+        """Process events that occur on every tick."""
         # Game balls.
         for ball in self.game_balls:
             ball.tick(dt)
@@ -77,30 +108,13 @@ class App():
                         self.ball_is_growing = False
                         break
         
-        self._last_tick = this_tick
+        # Debug tps shenanigans.
         self.tickdata += [dt]
         if len(self.tickdata) == 5000:
+            # If this value gets below 200, then we will have a problem with the framerate.
+            # Value last time I checked: >70,000tps. 
             print("%.0f" % (1000 * 5000 / sum(self.tickdata)))
             self.tickdata = []
-
-        ### FRAME PROCESSING: 
-
-        # Do not continue if not enough time has passed between frames. 
-        if this_tick - self._last_frame < 1e9 // FPS:
-            return
-
-        # Reset the screen. 
-        self.screen.fill((0, 0, 0))
-        # Game balls.
-        for ball in self.game_balls:
-            pygame.draw.circle(self.screen, **ball.render())
-        # Player balls.
-        for ball in self.player_balls:
-            pygame.draw.circle(self.screen, **ball.render())
-
-        # Render
-        pygame.display.flip()
-        self._last_frame = this_tick
 
 game: App = App()
 while True:
