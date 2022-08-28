@@ -1,6 +1,7 @@
 from __future__ import annotations
 from .ball import Ball
 from pygame import mouse
+from .vector import Vector
 
 class Playerball(Ball):
     """
@@ -21,32 +22,25 @@ class Playerball(Ball):
         # The vertical acceleration of the ball in px/s^2. 
         self.gravity: float = 735 # Random guesses. 75 * g feels good.
         # The positon of the ball. Follows the position of the mouse, which is passed to this as an xy parameter.
-        self.pos: dict[str, float] = {"x": x, "y": y}
-        self.vel: dict[str, float] = {"x": 0, "y": 0}
+        self.pos: Vector = Vector(x, y)
+        self.vel: Vector = Vector(0, 0)
 
     def follow_mouse(self: Playerball) -> None:
-        # The ball follows the mouse. This allows 
-        position_tuple = mouse.get_pos()
-        # On one hand, I am too civilized to store the position in a tuple.
-        # On the other hand, there is probably a good reason to use a tuple. 
-        self.pos = {
-            "x": position_tuple[0],
-            "y": position_tuple[1],
-        }
+        self.pos: Vector = Vector(*mouse.get_pos())
 
     def increase_radius(self: Playerball, dt: float) -> None:
         self._r += self.grow_speed * dt / 1000
         # If the ball's growth has hit a wall...
-        if abs(self.pos["x"] - 500) + self.radius() > 500 or abs(self.pos["y"] - 500) + self.radius() > 500:
+        if abs(self.pos.x - 500) + self.radius() > 500 or abs(self.pos.y - 500) + self.radius() > 500:
             # Then immediately stop growing. 
             self.is_growing = False
 
     def move(self: Playerball, dt: float) -> None:
-        if self.pos["y"] != 1000 - self.radius():
-            self.vel["y"] += self.gravity * dt / 1000
-            self.pos["y"] = min(self.pos["y"] + self.vel["y"] * dt / 1000, 1000 - self.radius())
+        if self.pos.y != 1000 - self.radius():
+            self.vel.y += self.gravity * dt / 1000
+            self.pos.y = min(self.pos.y + self.vel.y * dt / 1000, 1000 - self.radius())
         else:
-            self.vel["y"] = 0
+            self.vel.y = 0
 
     def onmouseup(self: Playerball) -> None:
         self.is_growing = False

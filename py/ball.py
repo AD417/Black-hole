@@ -2,6 +2,7 @@ from __future__ import annotations
 from random import random, randint, choice
 from math import sqrt, hypot
 from typing import Any
+from .vector import Vector
 
 class Ball():
     """
@@ -16,20 +17,20 @@ class Ball():
         # The density of the ball, required for momentum calculations
         self._d = 1.0
         # The position of the ball. 
-        self.pos: dict[str, float] = {"x": randint(100, 900), "y": randint(100, 900)}
+        self.pos: Vector = Vector(randint(100, 900), randint(100, 900))
         # The velocity and velocity vector of the ball.
         self.velocity: int = 500
         # This value is randomly generated such that the velocity vector has constant magnitude but variable direction. 
         x_component = self.velocity * random()
-        self.vel: dict[str, float] = {
-            "x": x_component * choice([1, -1]), 
-            "y": sqrt(self.velocity ** 2 - x_component ** 2) * choice([1, -1])
-        }
+        self.vel: Vector = Vector(
+            x_component * choice([1, -1]), 
+            sqrt(self.velocity ** 2 - x_component ** 2) * choice([1, -1])
+        )
 
     def distance_to(self: Ball, other: Ball) -> float:
         return hypot(
-            self.pos["x"] - other.pos["x"],
-            self.pos["y"] - other.pos["y"]
+            self.pos.x - other.pos.x,
+            self.pos.y - other.pos.y
         )
 
     def collides_with(self: Ball, other: Ball) -> bool:
@@ -48,11 +49,14 @@ class Ball():
         Move the ball, based on the amount of time since the last tick
         :param dt: the amount of time, in milliseconds, that has passed since the last move
         """
-        for key in self.vel:
-            self.pos[key] += self.vel[key] * (dt / 1000)
-            if abs(self.pos[key] - 500) + self.radius() > 500:
-                self.pos[key] = max(min(self.pos[key], 1000 - self.radius()), self.radius())
-                self.vel[key] *= -1
+        self.pos.x += self.vel.x * (dt / 1000)
+        if abs(self.pos.x - 500) + self.radius() > 500:
+            self.pos.x = max(min(self.pos.x, 1000 - self.radius()), self.radius())
+            self.vel.x *= -1
+        self.pos.y += self.vel.y * (dt / 1000)
+        if abs(self.pos.y - 500) + self.radius() > 500:
+            self.pos.y = max(min(self.pos.y, 1000 - self.radius()), self.radius())
+            self.vel.y *= -1
 
     def radius(self: Ball) -> int:
         """Get the current radius of the ball"""
@@ -65,7 +69,7 @@ class Ball():
         """
         return {
             "color": self.color,
-            "center": (self.pos["x"], self.pos["y"]),
+            "center": (self.pos.x, self.pos.y),
             "radius": self.radius()
         }
 
