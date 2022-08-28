@@ -18,7 +18,7 @@ class Ball():
         # The position of the ball. 
         self.pos: dict[str, float] = {"x": randint(100, 900), "y": randint(100, 900)}
         # The velocity and velocity vector of the ball.
-        self.velocity: int = 100
+        self.velocity: int = 500
         # This value is randomly generated such that the velocity vector has constant magnitude but variable direction. 
         x_component = self.velocity * random()
         self.vel: dict[str, float] = {

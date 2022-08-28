@@ -17,9 +17,9 @@ class Playerball(Ball):
         # and only grow while the mouse is held down, so the initial value is true. 
         self.growing: bool = True
         # The speed of growth, in change in radius per second. 
-        self.grow_speed: int = 10
+        self.grow_speed: int = 100
         # The vertical acceleration of the ball in px/s^2. 
-        self.gravity: float = 9.8 # Random guesses.
+        self.gravity: float = 735 # Random guesses. 75 * g
         # The positon of the ball. Follows the position of the mouse, which is passed to this as an xy parameter.
         self.pos: dict[str, float] = {"x": x, "y": y}
         self.vel: dict[str, float] = {"x": 0, "y": 0}
