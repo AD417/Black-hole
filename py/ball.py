@@ -38,6 +38,7 @@ class Ball():
         for key in self.vel:
             self.pos[key] += self.vel[key] * (dt / 1000)
             if abs(self.pos[key] - 500) + self.radius() > 500:
+                self.pos[key] = max(min(self.pos[key], 1000 - self.radius()), self.radius())
                 self.vel[key] *= -1
 
     def radius(self: Ball) -> int:

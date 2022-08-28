@@ -65,8 +65,8 @@ class App():
         
         self._last_tick = this_tick
         self.tickdata += [dt]
-        if len(self.tickdata) == 500:
-            print(sum(self.tickdata) / 500)
+        if len(self.tickdata) == 5000:
+            print("%.0f" % (1000 * 5000 / sum(self.tickdata)))
             self.tickdata = []
 
         ### FRAME PROCESSING: 
