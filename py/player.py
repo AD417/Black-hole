@@ -15,7 +15,7 @@ class Playerball(Ball):
         self.color = (127, 0, 127)
         # Whether or not this ball grows currently. These balls are initialized on a click, 
         # and only grow while the mouse is held down, so the initial value is true. 
-        self.growing: bool = True
+        self.is_growing: bool = True
         # The speed of growth, in change in radius per second. 
         self.grow_speed: int = 100
         # The vertical acceleration of the ball in px/s^2. 
@@ -39,7 +39,7 @@ class Playerball(Ball):
         # If the ball's growth has hit a wall...
         if abs(self.pos["x"] - 500) + self.radius() > 500 or abs(self.pos["y"] - 500) + self.radius() > 500:
             # Then immediately stop growing. 
-            self.growing = False
+            self.is_growing = False
 
     def move(self: Playerball, dt: int) -> None:
         if self.pos["y"] != 1000 - self.radius():
@@ -49,10 +49,10 @@ class Playerball(Ball):
             self.vel["y"] = 0
 
     def onmouseup(self: Playerball) -> None:
-        self.growing = False
+        self.is_growing = False
 
     def tick(self: Playerball, dt: int) -> None:
-        if self.growing:
+        if self.is_growing:
             self.follow_mouse()
             self.increase_radius(dt)
         else:

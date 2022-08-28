@@ -24,6 +24,8 @@ class App():
         self._last_tick: int = time_ns()
         # The time of the last frame, in nanoseconds. Starts at initialization. 
         self._last_frame: int = time_ns()
+        # If a ball is currently growing. 
+        self.ball_is_growing: bool = False
         # The balls placed in the level.
         self.game_balls: list[Ball] = [Ball() for _ in range(5)]
         # The balls that the player places. 
@@ -42,9 +44,11 @@ class App():
                 exit(0)
             # Mouse click - start creating a new black hole. 
             elif event.type == MOUSEBUTTONDOWN:
+                self.ball_is_growing = True
                 self.player_balls += [Playerball(*pygame.mouse.get_pos())]
             # Mouse release - stop expanding the most recent black hole. 
-            elif event.type == MOUSEBUTTONUP:
+            elif event.type == MOUSEBUTTONUP and self.ball_is_growing:
+                self.ball_is_growing = False
                 self.player_balls[-1].onmouseup()
 
         # This frame -- the time difference between this frame and the last frame
@@ -62,6 +66,16 @@ class App():
         # Player balls.
         for ball in self.player_balls:
             ball.tick(dt)
+        # Check player collision with other balls.
+        if self.ball_is_growing:
+            active_ball = self.player_balls[-1]
+            if active_ball.is_growing:
+                for other_ball in self.game_balls:
+                    # If the active ball hits another ball, then delete the active ball. 
+                    if active_ball.collides_with(other_ball): 
+                        self.player_balls.pop()
+                        self.ball_is_growing = False
+                        break
         
         self._last_tick = this_tick
         self.tickdata += [dt]

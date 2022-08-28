@@ -1,6 +1,6 @@
 from __future__ import annotations
 from random import random, randint, choice
-from math import sqrt
+from math import sqrt, hypot
 from typing import Any
 
 class Ball():
@@ -25,6 +25,15 @@ class Ball():
             "x": x_component * choice([1, -1]), 
             "y": sqrt(self.velocity ** 2 - x_component ** 2) * choice([1, -1])
         }
+
+    def distance_to(self: Ball, other: Ball) -> float:
+        return hypot(
+            self.pos["x"] - other.pos["x"],
+            self.pos["y"] - other.pos["y"]
+        )
+
+    def collides_with(self: Ball, other: Ball) -> bool:
+        return self.distance_to(other) < self.radius() + other.radius()
 
     def momentum(self: Ball) -> float:
         """Calculate the momentum of the ball, using p = mv"""
