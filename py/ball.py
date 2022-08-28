@@ -10,9 +10,9 @@ class Ball():
 
     def __init__(self: Ball) -> Ball:
         # The color of the ball, for rendering.
-        self.color = (0, 127, 255)
+        self.color: tuple[int] = (0, 127, 255)
         # The radius of the ball, in pixels
-        self._r: int = 1
+        self._r: float = 25.0
         # The mass of the ball, required for momentum calculations
         self._m = 1.0
         # The position of the ball. 
@@ -37,7 +37,7 @@ class Ball():
         """
         for key in self.vel:
             self.pos[key] += self.vel[key] * (dt / 1000)
-            if abs(self.pos[key] - 500) > 400:
+            if abs(self.pos[key] - 500) + self.radius() > 500:
                 self.vel[key] *= -1
 
     def radius(self: Ball) -> int:
@@ -54,3 +54,9 @@ class Ball():
             "center": (self.pos["x"], self.pos["y"]),
             "radius": self.radius()
         }
+
+    def tick(self: Ball, dt: int) -> None:
+        """
+        Perform updates for this entity for this frame/tick.
+        """
+        self.move(dt)
