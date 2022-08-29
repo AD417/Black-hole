@@ -8,8 +8,6 @@ from pygame import (
     QUIT
 )
 from time import time_ns
-# The framerate of the application. This program can run rather quickly. 
-FPS = 100
 
 class App():
     """
@@ -17,6 +15,12 @@ class App():
     http://scholtek.com/blackhole/,
     Which itself is inspired by a game called Super Fill-Up. 
     """
+
+    # The framerate of the application. This program can run rather quickly. 
+    FPS: int = 100
+
+    PRINT_TPS: bool = False
+
     def __init__(self: App) -> App:
         pygame.init()
 
@@ -69,7 +73,7 @@ class App():
         ### FRAME PROCESSING: 
 
         # Do not continue if not enough time has passed between frames. 
-        if this_tick - self._last_frame < 1e9 // FPS:
+        if this_tick - self._last_frame < 1e9 // App.FPS:
             return
 
         self.frame()
@@ -92,33 +96,42 @@ class App():
     def tick(self: App, dt: float) -> None:
         """Process events that occur on every tick."""
         # Game balls.
-        for i in range(len(self.game_balls)):
-            ball = self.game_balls[i]
+        for ball in self.game_balls:
             ball.tick(dt)
-            for other_ball in self.game_balls[i+1:]:
-                if ball.collides_with(other_ball):
-                    ball.process_collision_with(other_ball)
         # Player balls.
         for ball in self.player_balls:
             ball.tick(dt)
-        # Check player collision with other balls.
+        # Check player collision with other balls FIRST
         if self.ball_is_growing:
             active_ball = self.player_balls[-1]
             if active_ball.is_growing:
                 for other_ball in self.game_balls:
                     # If the active ball hits another ball, then delete the active ball. 
                     if active_ball.collides_with(other_ball): 
+                        active_ball.process_collision_with(other_ball)
                         self.player_balls.pop()
+                        print(len(self.player_balls))
                         self.ball_is_growing = False
                         break
+                for other_ball in self.player_balls[:-1]:
+                    if (active_ball.collides_with(other_ball)):
+                        self.ball_is_growing = False
+                        active_ball.is_growing = False
+        # Check collisions:
+        for i in range(len(self.game_balls) + len(self.player_balls[:-1])):
+            ball = self.game_balls[i]
+            for other_ball in (self.game_balls[i+1:] + self.player_balls):
+                if ball.collides_with(other_ball):
+                    ball.process_collision_with(other_ball)
         
-        # Debug tps shenanigans.
-        self.tickdata += [dt]
-        if len(self.tickdata) == 500:
-            # If this value gets below 200, then we will have a problem with the framerate.
-            # Value last time I checked: ~400tps. 
-            print("%.0f" % (1000 * 500 / sum(self.tickdata)))
-            self.tickdata = []
+        if App.PRINT_TPS:
+            # Debug tps shenanigans.
+            self.tickdata += [dt]
+            if len(self.tickdata) == 500:
+                # If this value gets below 200, then we will have a problem with the framerate.
+                # Value last time I checked: ~400tps. 
+                print("%.0f" % (1000 * 500 / sum(self.tickdata)))
+                self.tickdata = []
 
 game: App = App()
 while True:
