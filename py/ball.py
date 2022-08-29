@@ -28,10 +28,7 @@ class Ball():
         )
 
     def distance_to(self: Ball, other: Ball) -> float:
-        return hypot(
-            self.pos.x - other.pos.x,
-            self.pos.y - other.pos.y
-        )
+        return (self.pos - other.pos).magnitude()
 
     def collides_with(self: Ball, other: Ball) -> bool:
         return self.distance_to(other) < self.radius() + other.radius()
@@ -49,11 +46,10 @@ class Ball():
         Move the ball, based on the amount of time since the last tick
         :param dt: the amount of time, in milliseconds, that has passed since the last move
         """
-        self.pos.x += self.vel.x * (dt / 1000)
+        self.pos += self.vel * (dt / 1000)
         if abs(self.pos.x - 500) + self.radius() > 500:
             self.pos.x = max(min(self.pos.x, 1000 - self.radius()), self.radius())
             self.vel.x *= -1
-        self.pos.y += self.vel.y * (dt / 1000)
         if abs(self.pos.y - 500) + self.radius() > 500:
             self.pos.y = max(min(self.pos.y, 1000 - self.radius()), self.radius())
             self.vel.y *= -1
