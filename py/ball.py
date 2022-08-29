@@ -117,13 +117,12 @@ class Ball():
         # self.vel = tangent * dptan1 + normal * m1
         # other.vel = tangent * dptan2 + normal * m2
 
-        kx = self.vel.x - other.vel.x
-        ky = self.vel.y - other.vel.y
-        p = 2 * (normal.x * kx + normal.y * ky) / (self.mass() + other.mass())
-        self.vel.x = self.vel.x - p * other.mass() * normal.x
-        self.vel.y = self.vel.y - p * other.mass() * normal.y
-        other.vel.x = other.vel.x + p * self.mass() * normal.x
-        other.vel.y = other.vel.y + p * self.mass() * normal.y
+        k = self.vel - other.vel
+        p = 2 * (normal.x * k.x + normal.y * k.y) / (self.mass() + other.mass())
+        self.vel = self.vel - p * other.mass() * normal
+        self.vel.scale_to_length(self.velocity)
+        other.vel = other.vel + p * self.mass() * normal
+        other.vel.scale_to_length(other.velocity)
 
     def tick(self: Ball, dt: float) -> None:
         """
