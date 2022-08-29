@@ -114,10 +114,10 @@ class App():
         
         # Debug tps shenanigans.
         self.tickdata += [dt]
-        if len(self.tickdata) == 5000:
+        if len(self.tickdata) == 500:
             # If this value gets below 200, then we will have a problem with the framerate.
-            # Value last time I checked: >70,000tps. 
-            print("%.0f" % (1000 * 5000 / sum(self.tickdata)))
+            # Value last time I checked: ~400tps. 
+            print("%.0f" % (1000 * 500 / sum(self.tickdata)))
             self.tickdata = []
 
 game: App = App()

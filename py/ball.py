@@ -1,8 +1,8 @@
 from __future__ import annotations
 from random import random, randint, choice
 from math import sqrt, hypot
+from pygame.math import Vector2
 from typing import Any
-from .vector import Vector
 
 class Ball():
     """
@@ -14,15 +14,15 @@ class Ball():
         self.color: tuple[int] = (0, 127, 255)
         # The radius of the ball, in pixels
         self._r: float = 25.0
-        # The density of the ball, required for momentum calculations
+        # The density of the ball, required for mass and momentum calculations
         self._d = 1.0
         # The position of the ball. 
-        self.pos: Vector = Vector(randint(100, 900), randint(100, 900))
+        self.pos: Vector2 = Vector2(randint(100, 900), randint(100, 900))
         # The velocity and velocity vector of the ball.
-        self.velocity: int = 500
+        self.velocity: int = 250
         # This value is randomly generated such that the velocity vector has constant magnitude but variable direction. 
         x_component = self.velocity * random()
-        self.vel: Vector = Vector(
+        self.vel: Vector2 = Vector2(
             x_component * choice([1, -1]), 
             sqrt(self.velocity ** 2 - x_component ** 2) * choice([1, -1])
         )
@@ -95,17 +95,35 @@ class Ball():
         """
         Compute the resulting velocities of 2 balls that hit each other. 
         Credit for this goes to OneLoneCoder, https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_Balls1.cpp 
+        and marvin939, https://github.com/marvin939/pygame-circle-collision/blob/master/main.py 
         """
+        distance_vec = self.pos - other.pos
+        normal = distance_vec.normalize()
+        # tangent = Vector2(-normal.y, normal.x)	# rotate normal 90 deg
 
-        normal_position_vector: Vector = (self.pos - other.pos).get_unit()
-        normal_velocity_vector: Vector = (self.vel - other.vel).get_unit()
+        # # Dot product tangent
+        # dptan1 = self.vel.dot(tangent)	# proj self.vel to tangent
+        # dptan2 = other.vel.dot(tangent)	# proj other.vel to tangent
 
-        # I could not determine what this represents just by reading the code. 
-        # Best guess is something related to some kind of momentum factor. 
-        magic_number: float = normal_position_vector.dot_product(normal_velocity_vector) / (self.mass() + other.mass())
+        # # Dot product normal
+        # dpnorm1 = self.vel.dot(normal)
+        # dpnorm2 = other.vel.dot(normal)
 
-        self.vel -= normal_position_vector * magic_number * other.mass()
-        other.vel -= normal_position_vector * magic_number * self.mass()
+        # # Conservation of momentum in 1D (wikipedia)
+        # m1 = (dpnorm1 * (self.mass() - other.mass()) + 2 * other.mass() * dpnorm2) / (self.mass() + other.mass())
+        # m2 = (dpnorm2 * (other.mass() - self.mass()) + 2 * self.mass() * dpnorm1) / (self.mass() + other.mass())
+        # 
+        # # Update other velocities
+        # self.vel = tangent * dptan1 + normal * m1
+        # other.vel = tangent * dptan2 + normal * m2
+
+        kx = self.vel.x - other.vel.x
+        ky = self.vel.y - other.vel.y
+        p = 2 * (normal.x * kx + normal.y * ky) / (self.mass() + other.mass())
+        self.vel.x = self.vel.x - p * other.mass() * normal.x
+        self.vel.y = self.vel.y - p * other.mass() * normal.y
+        other.vel.x = other.vel.x + p * self.mass() * normal.x
+        other.vel.y = other.vel.y + p * self.mass() * normal.y
 
     def tick(self: Ball, dt: float) -> None:
         """

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from .ball import Ball
 from pygame import mouse
-from .vector import Vector
+from pygame.math import Vector2
 
 class Playerball(Ball):
     """
@@ -22,11 +22,11 @@ class Playerball(Ball):
         # The vertical acceleration of the ball in px/s^2. 
         self.gravity: float = 735 # Random guesses. 75 * g feels good.
         # The positon of the ball. Follows the position of the mouse, which is passed to this as an xy parameter.
-        self.pos: Vector = Vector(x, y)
-        self.vel: Vector = Vector(0, 0)
+        self.pos: Vector2 = Vector2(x, y)
+        self.vel: Vector2 = Vector2(0, 0)
 
     def follow_mouse(self: Playerball) -> None:
-        self.pos: Vector = Vector(*mouse.get_pos())
+        self.pos: Vector2 = Vector2(*mouse.get_pos())
 
     def increase_radius(self: Playerball, dt: float) -> None:
         self._r += self.grow_speed * dt / 1000
