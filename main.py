@@ -92,8 +92,12 @@ class App():
     def tick(self: App, dt: float) -> None:
         """Process events that occur on every tick."""
         # Game balls.
-        for ball in self.game_balls:
+        for i in range(len(self.game_balls)):
+            ball = self.game_balls[i]
             ball.tick(dt)
+            for other_ball in self.game_balls[i+1:]:
+                if ball.collides_with(other_ball):
+                    ball.process_collision_with(other_ball)
         # Player balls.
         for ball in self.player_balls:
             ball.tick(dt)

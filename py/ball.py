@@ -53,6 +53,13 @@ class Ball():
         if abs(self.pos.y - 500) + self.radius() > 500:
             self.pos.y = max(min(self.pos.y, 1000 - self.radius()), self.radius())
             self.vel.y *= -1
+    
+    def process_collision_with(self: Ball, other: Ball) -> None:
+        """
+        Compute the outcome of 2 balls that have collided with each other. 
+        """
+        self.resolve_intersection_with(other)
+        self.resolve_velocity_with(other)
 
     def radius(self: Ball) -> int:
         """Get the current radius of the ball"""
@@ -68,6 +75,37 @@ class Ball():
             "center": (self.pos.x, self.pos.y),
             "radius": self.radius()
         }
+
+    def resolve_intersection_with(self: Ball, other: Ball) -> None:
+        """
+        Displace 2 balls that hit each other such that they are no longer intersecting. 
+        Credit for this goes to OneLoneCoder, https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_Balls1.cpp 
+        """
+
+        distance = self.distance_to(other)
+
+        overlap = 0.5 * (distance - self.radius() - other.radius())
+
+        self.pos -= (self.pos - other.pos) * (overlap / distance)
+        other.pos += (self.pos - other.pos) * (overlap / distance)
+
+
+    
+    def resolve_velocity_with(self: Ball, other: Ball) -> None:
+        """
+        Compute the resulting velocities of 2 balls that hit each other. 
+        Credit for this goes to OneLoneCoder, https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_Balls1.cpp 
+        """
+
+        normal_position_vector: Vector = (self.pos - other.pos).get_unit()
+        normal_velocity_vector: Vector = (self.vel - other.vel).get_unit()
+
+        # I could not determine what this represents just by reading the code. 
+        # Best guess is something related to some kind of momentum factor. 
+        magic_number: float = normal_position_vector.dot_product(normal_velocity_vector) / (self.mass() + other.mass())
+
+        self.vel -= normal_position_vector * magic_number * other.mass()
+        other.vel -= normal_position_vector * magic_number * self.mass()
 
     def tick(self: Ball, dt: float) -> None:
         """
