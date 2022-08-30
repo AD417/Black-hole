@@ -113,14 +113,18 @@ class App():
                         print(len(self.player_balls))
                         self.ball_is_growing = False
                         break
-                for other_ball in self.player_balls[:-1]:
-                    if (active_ball.collides_with(other_ball)):
-                        self.ball_is_growing = False
-                        active_ball.is_growing = False
+                else:
+                    for other_ball in self.player_balls[:-1]:
+                        if (active_ball.collides_with(other_ball)):
+                            self.ball_is_growing = False
+                            active_ball.is_growing = False
         # Check collisions:
         for i in range(len(self.game_balls) + len(self.player_balls[:-1])):
-            ball = self.game_balls[i]
-            for other_ball in (self.game_balls[i+1:] + self.player_balls):
+            if i < len(self.game_balls):
+                ball = self.game_balls[i]
+            else:
+                ball = self.player_balls[i - len(self.game_balls)]
+            for other_ball in (self.game_balls + self.player_balls)[i+1:]:
                 if ball.collides_with(other_ball):
                     ball.process_collision_with(other_ball)
         
