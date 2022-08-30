@@ -1,6 +1,7 @@
 from __future__ import annotations
 from py.ball import Ball
 from py.player import Playerball
+from py.bigball import BigBall
 import pygame
 from pygame import (
     MOUSEBUTTONDOWN,
@@ -27,7 +28,7 @@ class App():
         # If a ball is currently growing. 
         self.ball_is_growing: bool = False
         # The balls placed in the level.
-        self.game_balls: list[Ball] = [Ball() for _ in range(5)]
+        self.game_balls: list[Ball] = [Ball() for _ in range(3)] + [BigBall() for _ in range(2)]
         # The balls that the player places. 
         self.player_balls: list[Playerball] = []
         # The "surface" on which the game is played.
