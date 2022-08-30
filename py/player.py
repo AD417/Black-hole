@@ -41,6 +41,10 @@ class Playerball(Ball):
             self.pos.y = min(self.pos.y + self.vel.y * dt / 1000, 1000 - self.radius())
         else:
             self.vel.y = 0
+        
+        if abs(self.pos.x - 500) + self.radius() > 500:
+            self.pos.x = max(min(self.pos.x, 1000 - self.radius()), self.radius())
+            self.vel.x *= -1
 
     def onmouseup(self: Playerball) -> None:
         self.is_growing = False
